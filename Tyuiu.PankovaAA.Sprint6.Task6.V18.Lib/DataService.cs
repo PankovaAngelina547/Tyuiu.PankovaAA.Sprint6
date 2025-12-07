@@ -6,24 +6,31 @@ namespace Tyuiu.PankovaAA.Sprint6.Task6.V18.Lib
     {
         public string CollectTextFromFile(string path)
         {
-            string[] lines = File.ReadAllLines(path, Encoding.Default);
-            StringBuilder result = new StringBuilder();
+            if (!File.Exists(path))
+                return "Файл не найден";
 
-            foreach (string line in lines)
+            try
             {
-                string[] words = line.Split(new char[] { ' ', ',', '.', '!', '?', ';', ':', '\t' },
-                                           StringSplitOptions.RemoveEmptyEntries);
+                string text = File.ReadAllText(path, Encoding.Default);
+                string[] separators = { " ", "\r", "\n", "\t", ",", ".", "!", "?", ";", ":", "(", ")", "[", "]", "{", "}", "\"", "'" };
+                string[] words = text.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+
+                StringBuilder result = new StringBuilder();
 
                 foreach (string word in words)
                 {
-                    if (word.IndexOf('n', StringComparison.OrdinalIgnoreCase) >= 0)
+                    if (word.Contains('n'))
                     {
                         result.Append(word + " ");
                     }
                 }
-            }
 
-            return result.ToString().Trim();
+                return result.ToString().Trim();
+            }
+            catch
+            {
+                return "Ошибка чтения файла";
+            }
         }
     }
 }

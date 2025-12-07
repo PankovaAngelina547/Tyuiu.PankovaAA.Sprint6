@@ -1,100 +1,51 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 
-namespace Tyuiu.PankovaAA.Sprint6.Task6.V18
+namespace Tyulu.PankovaAA.Sprint6
 {
     public partial class FormMain : Form
     {
+        private DataService dataService;
+
         public FormMain()
         {
             InitializeComponent();
+            dataService = new DataService();
         }
 
-        private void buttonOpenFile_PAA_Click(object sender, EventArgs e)
+        private void ButtonOpen_Click(object sender, EventArgs e)
         {
-            try
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                OpenFileDialog openFileDialog = new OpenFileDialog
-                {
-                    Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
-                    Title = "Выберите файл для обработки"
-                };
+                openFileDialog.Filter = "Текстовые файлы (*.txt)|*.txt|Все файлы (*.*)|*.*";
+                openFileDialog.Title = "Выберите файл InPutFileTask6V18.txt";
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    string path = openFileDialog.FileName;
-                    textBoxPath_PAA.Text = path;
-
-                    string fileContent = File.ReadAllText(path, System.Text.Encoding.Default);
-                    textBoxIn_PAA.Text = fileContent;
-
-                    textBoxOut_PAA.Clear();
+                    labelPath.Text = "Путь к файлу: " + openFileDialog.FileName;
+                    textBoxIn.Text = dataService.CollectTextFromFile(openFileDialog.FileName);
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void buttonDo_PAA_Click(object sender, EventArgs e)
+        private void ButtonExecute_Click(object sender, EventArgs e)
         {
-            try
+            string[] separators = { " ", "\r", "\n", "\t", ",", ".", "!", "?", ";", ":", "(", ")", "[", "]", "{", "}", "\"", "'" };
+            string[] words = textBoxIn.Text.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+
+            StringBuilder result = new StringBuilder();
+
+            foreach (string word in words)
             {
-                if (string.IsNullOrEmpty(textBoxPath_PAA.Text))
+                if (word.Contains('n'))
                 {
-                    MessageBox.Show("Сначала откройте файл", "Внимание",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
+                    result.Append(word + " ");
                 }
-
-                string path = textBoxPath_PAA.Text;
-
-                DataService ds = new DataService();
-                string result = ds.CollectTextFromFile(path);
-
-                textBoxOut_PAA.Text = result;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
-        private void buttonHelp_PAA_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Таск 6 выполнила студент группы ПИНб-25-1 Панькова Ангелина Алексеевна",
-                          "Справка",
-                          MessageBoxButtons.OK,
-                          MessageBoxIcon.Information);
-        }
-
-        public class DataService
-        {
-            public string CollectTextFromFile(string path)
-            {
-                string[] lines = File.ReadAllLines(path, System.Text.Encoding.Default);
-                System.Text.StringBuilder result = new System.Text.StringBuilder();
-
-                foreach (string line in lines)
-                {
-                    string[] words = line.Split(new char[] { ' ', ',', '.', '!', '?', ';', ':', '\t' },
-                                               System.StringSplitOptions.RemoveEmptyEntries);
-
-                    foreach (string word in words)
-                    {
-                        if (word.IndexOf('n', System.StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
-                            result.Append(word + " ");
-                        }
-                    }
-                }
-
-                return result.ToString().Trim();
-            }
+            textBoxOut.Text = result.ToString().Trim();
         }
     }
 }
