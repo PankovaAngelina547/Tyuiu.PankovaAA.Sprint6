@@ -25,7 +25,7 @@ namespace Tyuiu.PankovaAA.Sprint6.Task7.V11.Lib
                     throw new ArgumentException("Файл пустой");
                 }
 
-                string[] firstLineValues = lines[0].Split(new char[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] firstLineValues = lines[0].Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 int cols = firstLineValues.Length;
                 int rows = lines.Length;
 
@@ -33,7 +33,7 @@ namespace Tyuiu.PankovaAA.Sprint6.Task7.V11.Lib
 
                 for (int i = 0; i < rows; i++)
                 {
-                    string[] values = lines[i].Split(new char[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] values = lines[i].Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
                     if (values.Length != cols)
                     {
@@ -67,18 +67,12 @@ namespace Tyuiu.PankovaAA.Sprint6.Task7.V11.Lib
                         }
                         else
                         {
-                            if (double.TryParse(cleanValue, out double doubleValue))
-                            {
-                                matrix[i, j] = (int)Math.Round(doubleValue);
-                            }
-                            else
-                            {
-                                throw new FormatException($"Неверный формат данных в строке {i + 1}, столбце {j + 1}: '{cleanValue}'");
-                            }
+                            throw new FormatException($"Неверный формат данных в строке {i + 1}, столбце {j + 1}: '{cleanValue}'");
                         }
                     }
                 }
 
+              
                 int fifthRowIndex = 4;
                 if (rows > fifthRowIndex)
                 {
