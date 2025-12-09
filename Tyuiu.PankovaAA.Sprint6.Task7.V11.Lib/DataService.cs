@@ -8,6 +8,7 @@ namespace Tyuiu.PankovaAA.Sprint6.Task7.V11.Lib
     public interface ISprint6Task7V11
     {
         int[,] GetMatrix(string path);
+        void TransformAndSave(string pathIn, string pathOut);
     }
 
     public class DataService : ISprint6Task7V11
@@ -17,7 +18,6 @@ namespace Tyuiu.PankovaAA.Sprint6.Task7.V11.Lib
             try
             {
                 string[] lines = File.ReadAllLines(path);
-
                 lines = lines.Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
 
                 if (lines.Length == 0)
@@ -25,7 +25,7 @@ namespace Tyuiu.PankovaAA.Sprint6.Task7.V11.Lib
                     throw new ArgumentException("Файл пустой");
                 }
 
-                string[] firstLineValues = lines[0].Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] firstLineValues = lines[0].Split(';');
                 int cols = firstLineValues.Length;
                 int rows = lines.Length;
 
@@ -33,33 +33,45 @@ namespace Tyuiu.PankovaAA.Sprint6.Task7.V11.Lib
 
                 for (int i = 0; i < rows; i++)
                 {
-                    string[] values = lines[i].Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] values = lines[i].Split(';');
 
                     if (values.Length != cols)
                     {
-                        throw new FormatException($"Строка {i + 1} содержит {values.Length} значений, ожидалось {cols}");
+                        throw new FormatException($"Несоответствие количества столбцов в строке {i + 1}");
                     }
 
                     for (int j = 0; j < cols; j++)
                     {
-                        string cleanValue = values[j].Trim();
-
-                        if (string.IsNullOrEmpty(cleanValue))
-                        {
-                            matrix[i, j] = 0;
-                        }
-                        else if (int.TryParse(cleanValue, out int value))
+                        if (int.TryParse(values[j], out int value))
                         {
                             matrix[i, j] = value;
                         }
                         else
                         {
-                            throw new FormatException($"Неверный формат данных в строке {i + 1}, столбце {j + 1}: '{cleanValue}'");
+                            matrix[i, j] = 0;
                         }
                     }
                 }
 
-                int fifthRowIndex = 4; 
+                return matrix;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ошибка при чтении файла: {ex.Message}", ex);
+            }
+        }
+
+        public void TransformAndSave(string pathIn, string pathOut)
+        {
+            try
+            {
+            
+                int[,] matrix = GetMatrix(pathIn);
+                int rows = matrix.GetLength(0);
+                int cols = matrix.GetLength(1);
+
+                
+                int fifthRowIndex = 4;
                 if (rows > fifthRowIndex)
                 {
                     for (int j = 0; j < cols; j++)
@@ -71,11 +83,23 @@ namespace Tyuiu.PankovaAA.Sprint6.Task7.V11.Lib
                     }
                 }
 
-                return matrix;
+            
+                using (StreamWriter sw = new StreamWriter(pathOut))
+                {
+                    for (int i = 0; i < rows; i++)
+                    {
+                        string[] rowValues = new string[cols];
+                        for (int j = 0; j < cols; j++)
+                        {
+                            rowValues[j] = matrix[i, j].ToString();
+                        }
+                        sw.WriteLine(string.Join(";", rowValues));
+                    }
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при чтении файла: {ex.Message}", ex);
+                throw new Exception($"Ошибка при преобразовании и сохранении: {ex.Message}", ex);
             }
         }
     }
