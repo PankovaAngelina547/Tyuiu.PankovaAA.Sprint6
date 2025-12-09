@@ -37,20 +37,7 @@ namespace Tyuiu.PankovaAA.Sprint6.Task7.V11.Lib
 
                     if (values.Length != cols)
                     {
-                        if (values.Length < cols)
-                        {
-                            string[] newValues = new string[cols];
-                            Array.Copy(values, newValues, values.Length);
-                            for (int k = values.Length; k < cols; k++)
-                            {
-                                newValues[k] = "0";
-                            }
-                            values = newValues;
-                        }
-                        else
-                        {
-                            values = values.Take(cols).ToArray();
-                        }
+                        throw new FormatException($"Строка {i + 1} содержит {values.Length} значений, ожидалось {cols}");
                     }
 
                     for (int j = 0; j < cols; j++)
@@ -72,8 +59,7 @@ namespace Tyuiu.PankovaAA.Sprint6.Task7.V11.Lib
                     }
                 }
 
-              
-                int fifthRowIndex = 4;
+                int fifthRowIndex = 4; 
                 if (rows > fifthRowIndex)
                 {
                     for (int j = 0; j < cols; j++)
@@ -89,7 +75,7 @@ namespace Tyuiu.PankovaAA.Sprint6.Task7.V11.Lib
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при чтении файла '{Path.GetFileName(path)}': {ex.Message}", ex);
+                throw new Exception($"Ошибка при чтении файла: {ex.Message}", ex);
             }
         }
     }
